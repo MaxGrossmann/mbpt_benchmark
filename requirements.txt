@@ -1,0 +1,4 @@
+Jinja2
+openpyxl
+-e ./qsgw_benchmark
+-r ./g0w0_benchmark/requirements.txt
