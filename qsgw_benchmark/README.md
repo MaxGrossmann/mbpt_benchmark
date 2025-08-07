@@ -1,7 +1,10 @@
 # Automated QSGW/QSGW^ calculations for non-magnetic semiconductors and insulators
 
 This repository contains a workflow that automatically performs LDA → QPG<sub>0</sub>W<sub>0</sub> → QSGW → QSGW^ calculations for non-magnetic semiconductors and insulators using the Questaal code.
-We ran the workflow for materials from the benchmark dataset of Borlido et al. [https://doi.org/10.1021/acs.jctc.9b00322, https://doi.org/10.1038/s41524-020-00360-0].
+We ran this workflow for the materials in the Borlido et al. benchmark dataset[^jctc][^npj].
+
+[^jctc]: P. Borlido, T. Aull, A. W. Huran, F. Tran, M. A. L. Marques, and S. Botti, Large-scale benchmark of exchange–correlation functionals for the determination of electronic band gaps of solids, J. Chem. Theory Comput. 15, 5069–5079 (2019), https://doi.org/10.1021/acs.jctc.9b00322
+[^npj]: P. Borlido, J. Schmidt, A. W. Huran, F. Tran, M. A. L. Marques, and S. Botti, Exchange-correlation functionals for band gaps of solids: benchmark, reparametrization and machine learning, npj Comput. Mater. 6, 96 (2020), https://doi.org/10.1038/s41524-020-00360-0
 
 We currently support both local calculations (`main_local.py`) and calculations on a Slurm-based supercomputer (`main_noctua.py` and `restart_noctua.py`), though the latter requires minor changes to `./qsgw_workflow/utils/sbatch.py`. 
 
