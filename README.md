@@ -1,8 +1,9 @@
 # Many‑Body Perturbation Theory Benchmark
 
-This repository contains two separate workflows that, when combined, perform various flavors of GW calculations. We used these workflows to calculate materials from the Borlido et al. benchmark dataset [https://doi.org/10.1021/acs.jctc.9b00322, 
-https://doi.org/10.1038/s41524-020-00360-0]. The calculation results are provided as JSON files. A detailed analysis of the results, including all of the tables and figures shown in the associated publication, can be found in the `results.ipynb` notebook. A summary of all the results is available as an Excel spreadsheet in the `spreadsheets/` directory. An updated version of the Borlido benchmark dataset was also placed there and is named `revised_bandgap
-_benchmark.xlsx`. In the revised dataset, we removed materials with questionable experiments and updated some experimental values with more recent ones. We urge adoption of our revised dataset. Please refer to our publication for details regarding the removed or updated materials.
+This repository contains two separate workflows that, when combined, perform various flavors of GW calculations. We used these workflows to calculate materials from the Borlido et al. benchmark dataset[^jctc][^npj]. The calculation results are provided as JSON files. A detailed analysis of the results, including all of the tables and figures shown in the associated publication, can be found in the `results.ipynb` notebook. A summary of all the results is available as an Excel spreadsheet in the `spreadsheets/` directory. An updated version of the Borlido benchmark dataset was also placed there and is named `revised_bandgap_benchmark.xlsx`. In the revised dataset, we removed materials with questionable experiments and updated some experimental values with more recent ones. We urge adoption of our revised dataset. Please refer to our publication for details regarding the removed or updated materials.
+
+[^jctc]: P. Borlido, T. Aull, A. W. Huran, F. Tran, M. A. L. Marques, and S. Botti, Large-scale benchmark of exchange–correlation functionals for the determination of electronic band gaps of solids, J. Chem. Theory Comput. 15, 5069–5079 (2019), https://doi.org/10.1021/acs.jctc.9b00322
+[^npj]: P. Borlido, J. Schmidt, A. W. Huran, F. Tran, M. A. L. Marques, and S. Botti, Exchange-correlation functionals for band gaps of solids: benchmark, reparametrization and machine learning, npj Comput. Mater. 6, 96 (2020), https://doi.org/10.1038/s41524-020-00360-0
 
 **Repository structure:**
 
