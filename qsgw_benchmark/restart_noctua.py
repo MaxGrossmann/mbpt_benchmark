@@ -6,7 +6,7 @@ DESCRIPTION:
     simple_metals.ipynb'. Once every five minutes the script checks if a new calculation can be started and
     if so, it starts it. We start with all materials with one site in the unit cell and then move to cells 
     with two sites, and so on. The 'nnodes' and 'ncores_per_node' variables determine how many cores each 
-    job can use. The total number of  available cores that the script can use can be adjusted on the fly in
+    job can use. The total number of available cores that the script can use can be adjusted on the fly in
     the 'ncores' file in the 'control/' directory. If you want to stop the script, just use 'CTRL+C'.
     
     Currently, the script is set up to run materials for our MBPT benchmark. Unfortunately, we cannot publish

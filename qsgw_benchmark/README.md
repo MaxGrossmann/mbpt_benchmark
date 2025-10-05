@@ -65,11 +65,10 @@ however, the workflow starts from scratch.
 
 Through some adjustments to the files `./qsgw_workflow/utils/sbatch.py`, `main_noctua.py`, and `restart_noctua.py`, one can use the workflow on a Slurm-based cluster to easily calculate multiple materials in parallel. Parallelization over multiple nodes is supported. You can adjust the total number of cores you want to use simultaneously for all materials combined by changing the number inside `control/ncores`. The number of cores that each job uses can be adjusted in the file `main_noctua.py`.
 
-
 **Input structures:**
 
 The code uses ComputedStructureEntries (CSEs) from pymatgen as input. 
-All CSE files are stored instored in the  `structures/` directory.
+All CSE files are stored instored in the `structures/` directory.
 We decided to use CSEs because the majority of large material databases, such as the Alexandria database, use them. 
 Additionally, the format is ideal for storing computational data. 
 Unfortunately, we cannot publish all of the input structures because they are from the ICSD. 
@@ -80,7 +79,7 @@ The ICSD IDs for all materials can be found in the publication by Borlido et al.
 
 **Plotting band structures, density of states, and dielectric functions:**
 
-In the analysis directory, we included two notebooks, `check_db_entry.ipynb` and `check_bse_transition_space.ipynb`, that enable easy plotting of the LDA, QSGW, and QSGW^ band structure, density of states (DOS), and dielectric function. In particular, the notebook `check_bse_transition_space.ipynb` highlights the automated selection of the transition space for the BSE.
+In the analysis directory, we included two notebooks, `make_plots.ipynb` and `check_bse_transition_space.ipynb`, that enable easy plotting of the LDA, QSGW, and QSGW^ band structure, density of states (DOS), and dielectric function. In particular, the notebook `check_bse_transition_space.ipynb` highlights the automated selection of the transition space for the BSE.
 
 **Project layout:**
 
@@ -89,7 +88,7 @@ qsgw_benchmark
 ├── analysis
 │   ├── audit_benchmark.ipynb
 │   ├── check_bse_transition_space.ipynb
-│   └── check_db_entry.ipynb
+│   └── make_plots.ipynb
 ├── control
 │   └── ncores
 ├── job_scripts

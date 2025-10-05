@@ -47,6 +47,9 @@ class BaseWorkflow:
         eps_tol=0.95, # SC
         qsgw_tol=0.00184, # Ry (~25 meV)
     ):
+        # sanity check
+        if nnodes <= 0 or ncores <= 0:
+            sys.exit(f"'nnodes' and 'ncores' must be > 0 (got nnodes={nnodes:d}, ncores={ncores:d})!")
         # initialize parameters
         self.calc_path = calc_path
         self.db_path = db_path
@@ -68,21 +71,6 @@ class BaseWorkflow:
         # in all other parts of the code is the total number of cores;
         # implementing jobs that use more than one node was an afterthought
         self.ncores = self.nnodes * self.ncores
-        """
-        I have tested standard DFT calculations using 'lmf' with multiple nodes, i.e., 
-        4 nodes with 2 cores per node, and using all cores does not really slow down the calculation. 
-        I also tested what happens when using more cores than k-points, i.e., I tested a 2x2x2 k-grid 
-        (3 irreduciable points for silicon) with 16 cores. I noticed that 'lmf' does not really care 
-        and still works normally. So we just use all cores (number of nodes times number of cores per node)
-        for the DFT calculations. The communication overhead seems negligible on the Noctua 2 in Paderborn 
-        where I tested this. The only time the number of nodes is used is when creating the 'pqmap' for QSGW
-        and BSE calculations, as these calculations can really benefit from the extra memory available when 
-        using multiple nodes.
-        
-        In general, it is recommended that you start any calculation on just one node first.
-        If memory is an issue, then multiple nodes should be used. 
-        Most commonly, QSGW^ and BSE calculations run out of memory.
-        """
 
     def _sanity_checks(self):
         """
@@ -590,7 +578,7 @@ class BaseWorkflow:
         )
         if output is None:
             return False
-        scf_data, scf_error_flag = output
+        scf_data, qsgw80_gap, scf_error_flag = output
         scf_time = time() - start_time
         # gather useful information in the database entry
         self.param_dict["qsgw_max_iter"] = max_iter
@@ -601,13 +589,15 @@ class BaseWorkflow:
             print(f"The QSGW self-consistency cycle did not converge after {max_iter:d} iterations!", flush=True)
         gap = scf_data[-1, 2]
         self.data_dict["gap_qsgw"] = gap
+        self.data_dict["gap_qsgw80"] = qsgw80_gap
         if gap <= 1e-3: # the code returns -1 if the 'lmf' does not find a gap, the 1e-3 is there to catch "strange" materials
             self.param_dict["metal_flag_qsgw"] = True
             print("\nThe calculated material is a metal in the QSGW.", flush=True)
         else:
             self.param_dict["metal_flag_qsgw"] = False
             print(f"\nQSGW gap = {gap:2.3f} eV.", flush=True)
-        self.param_dict["qsgw_flag"] = True # remember that QSGW calculation was performed
+            print(f"QSGW80 gap = {qsgw80_gap:2.3f} eV.", flush=True)
+        self.param_dict["qsgw_flag"] = True # remember that a QSGW calculation was performed
         self._save_db_entry()
         return True
         

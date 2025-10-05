@@ -35,7 +35,7 @@ class SemiconductorWorkflow(BaseWorkflow):
             highest_energy:     Energy in eV (determines the number of CBs in the BSE Hamiltonian)
         """
         # starting log
-        self.log(f"Starting QSGW semiconductor workflow using {self.nnodes:d} nodes and {self.ncores // self.nnodes:d} cores per node.")
+        self.log(f"Starting QSGW^ semiconductor workflow using {self.nnodes:d} nodes and {self.ncores // self.nnodes:d} cores per node.")
         
         # initializations
         self.init_db_and_calc_dir()

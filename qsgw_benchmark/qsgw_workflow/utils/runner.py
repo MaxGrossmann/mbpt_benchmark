@@ -107,7 +107,7 @@ def run_dft_with_soc_post_gw(ncores):
     """
     print("\nRunning a self-consistent DFT calculation with spin-orbit coupling.", flush=True)
     if not os.path.exists("sigm.mat") and not os.path.exists("sigm2.mat"):
-        sys.exit("DFT+SOC is not currently supported without a prior QSGW or QSGW^.")
+        sys.exit("\nDFT+SOC is currently not supported without a prior QSGW or QSGW^ calculation.")
     execute_command("cp sigm.mat sigm_tmp.mat; cp sigm2.mat sigm2_tmp.mat; cp rst.mat rst_tmp.mat; cp mixm.mat mixm_tmp.mat")
     execute_command("lmf ctrl.mat --wsig:fbz > dft_soc.log")
     execute_command("cp sigm2.mat sigm.mat")
@@ -119,7 +119,7 @@ def get_bandstructure(label):
     """
     This function calculates and parses the band structure on a standardized symmetry path.
     INPUT:
-        label:          Tag for the band structure file, e.g., "lda", "qsgw", "qsgwbar", ...
+        label:          Tag for the band structure file, e.g., "lda", "qsgw", "qsgwbse", ...
     OUTPUT:
         bs:             Dictionary with all information about the band structure
     """
@@ -127,7 +127,7 @@ def get_bandstructure(label):
     execute_command(f"lmchk --syml ctrl.mat > bs_dump.log")
     execute_command(f"lmf --band~fn=syml ctrl.mat >> bs_dump.log")
     execute_command(f"mv bnds.mat bnds_{label.lower():s}.mat")
-    bs = helper.parse_bandstructure(f"bnds_{label.lower():s}.mat")
+    bs = helper.parse_bs(f"bnds_{label.lower():s}.mat")
     bs["elem_list"] = None # compatibility with other band structure functions
     return bs
 
@@ -139,7 +139,7 @@ def get_atom_proj_bandstructure(struct, label):
     unique elements in a structure, we take the three with the lowest atomic number Z.
     INPUT:
         struct:         pymatgen structure object
-        label:          Tag for the band structure file (e.h. "lda", "qsgw", "qsgwbar", ...)
+        label:          Tag for the band structure file, e.g., "lda", "qsgw", "qsgwbse", ...
     OUTPUT: 
         bs:             Dictionary with all information about the band structure
     """
@@ -177,11 +177,10 @@ def get_atom_proj_bandstructure(struct, label):
         for i in range(3, len(elem_list)):
             print(f"        {elem_list[i][0]:s}", flush=True)
     proj_str += "~fn=syml"
-    # print(proj_str, flush=True) # debugging
     execute_command(f"lmchk --syml ctrl.mat > bs_{label.lower():s}.log")
     execute_command(f"lmf {proj_str:s} ctrl.mat >> bs_{label.lower():s}.log")
     execute_command(f"mv bnds.mat bnds_{label.lower():s}.mat")
-    bs = helper.parse_bandstructure(f"bnds_{label.lower():s}.mat")
+    bs = helper.parse_bs(f"bnds_{label.lower():s}.mat")
     bs["elem_list"] = elem_list # list of [elem, Z], sorted by Z, for which the projections are obtained
     return bs
 
@@ -190,7 +189,7 @@ def get_pdos(label):
     This function obtains the total DOS and PDOS.
     Projections up to "lcut=2", i.e., the d-orbitals, are obtained for all sites.
     INPUT:
-        label:              Tag for the PDOS file (e.h. "lda", "qsgw", "qsgwbar", ...)
+        label:              Tag for the PDOS file, e.g., "lda", "qsgw", "qsgwbse", ...
     OUTPUT
         pdos:               Dictionary with all information about the PDOS
     """
@@ -211,7 +210,7 @@ def get_pdos(label):
             pdos_helper_str += f"{match[2]:<7s}  {match[3]}"
         else:
             pdos_helper_str += f"{match[2]:<7s}  {match[3]}\n"
-    # string explaining the channels (first dimension) of the PDOS array
+    # string explaining the channels (first dimension) of the array containing the PDOS
     print(pdos_helper_str, flush=True)
     pdos.update({"pdos_helper_str": pdos_helper_str})
     return pdos
@@ -304,7 +303,6 @@ def calc_eps(kpts, ncores, label):
     """
     print(f"\nCalculating the {label.upper():s} IPA dielectric tensor.", flush=True)
     kstr = f"-vnk1={kpts[0]:d} -vnk2={kpts[1]:d} -vnk3={kpts[2]:d}"
-    print(f"(k-grid input string: {kstr:s})", flush=True) # debugging
     execute_command(
         f"mpirun -np {ncores:d} lmf {kstr:s} -vloptic=1 --quit=rho ctrl.mat > eps_{label.lower():s}.log"
     )
@@ -328,7 +326,7 @@ def run_qsgw_with_error_handling(name, nnodes, ncores, misc_str, fname):
     while bloch_sum_error_flag:
         if counter == 3:
             open("bloch_sum_error.txt", "w").close
-            sys.exit(f"Inexact inverse Bloch transform error. Tried to increase RSRNGE twice!")
+            sys.exit("\nInexact inverse Bloch transform error. Tried to increase RSRNGE twice!")
         helper.clean_qsgw(name, rst_flag=True, indent=True)
         mpi_str = helper.create_pqmap(nnodes, ncores)
         print("    Starting a QSGW calculation.", flush=True)
@@ -431,6 +429,10 @@ def qsgw_kpt_conv_semi(
         old_kppa = kppa
         kppa = helper.increase_kppa(struct, kppa)
         if kppa > max_kppa:
+            # save a copy of the self energy files
+            execute_command("cp sigm.mat sigm_qpg0w0.mat")
+            execute_command("cp sig.h5 sig_qpg0w0.h5")
+            # final log
             print(
                 "    The QSGW self energy k-grid is equal to the DFT k-grid. Stopping convergence.",
                 flush=True,
@@ -457,6 +459,10 @@ def qsgw_kpt_conv_semi(
             run_conv_flag = (np.abs(conv_data[-2][3] - conv_data[-1][3]) > etol) or (
                 gap == -1
             )
+    # save a copy of the self energy files
+    execute_command("cp sigm.mat sigm_qpg0w0.mat")
+    execute_command("cp sig.h5 sig_qpg0w0.h5")
+    # final log
     print("Finished the QSGW k-grid convergence.", flush=True)
     error_flag = 0 
     return kppa, kpts, error_flag, conv_data
@@ -468,6 +474,8 @@ def run_qsgw(name, nnodes, ncores, max_iter=25, fresh_start_flag=True):
     Normally this function is used right after the self energy k-grid convergence (see function above). 
     Collects the output data and checks if the self-consistency cycle has converged.
     If the calculation crashed, this function simply returns 'None'.
+    Once the calculation had finished successfully, we also calculated the 'QSGW80' band gap, since it was essentially free.
+    (Read: https://doi.org/10.1103/PhysRevMaterials.2.013807)
     INPUT:
         name:               Name of the material
         nnodes:             Number of nodes to be used for the calculation
@@ -480,6 +488,7 @@ def run_qsgw(name, nnodes, ncores, max_iter=25, fresh_start_flag=True):
         OR
         scf_data:           Summary of the self-consistency cycle
                             (list of lists, i.e., [[iteration, rms change in the self energy, band gap], [...]])
+        qsgw80_gap:         Band gap obtained by multiplying the self energy by 0.8
         error_flag:         Flag indicating if the self-consistency cycle did not converge
     """
     print("\nRunning a fully self-consistent QSGW calculation.", flush=True)
@@ -508,7 +517,7 @@ def run_qsgw(name, nnodes, ncores, max_iter=25, fresh_start_flag=True):
         bloch_sum_error_flag = helper.check_and_fix_bloch_sum()
         if bloch_sum_error_flag:
             open("bloch_sum_error.txt", "w").close
-            sys.exit(f"Inexact inverse Bloch transform error. Already tried to increase RSRNGE!")
+            sys.exit("\nInexact inverse Bloch transform error. Already tried to increase RSRNGE!")
         fresh_start_flag = True
     # check that the QSGW actually finished
     with open("qsgw.log", "r") as f:
@@ -560,7 +569,19 @@ def run_qsgw(name, nnodes, ncores, max_iter=25, fresh_start_flag=True):
         error_flag = 1
     else:
         error_flag = 0
-    return scf_data, error_flag
+    # save a copy of the self energy files
+    execute_command("cp sigm.mat sigm_qsgw.mat")
+    execute_command("cp sig.h5 sig_qsgw.h5")
+    # calculate the QSGW band gap using a rescaled self energy with a scaling factor of 0.8
+    execute_command("lmf --symsig --no-iactive --wsig --mixsig=0.8 ctrl.mat > llmf-sym_080.log")
+    execute_command("cp sigm.mat sigm~")
+    execute_command("cp sigm2.mat sigm.mat")
+    execute_command("rm -f mixm.mat")
+    execute_command(f"mpirun -np {ncores:d} lmf ctrl.mat > llmf_080.log")
+    execute_command("cp sigm.mat sigm_qsgw_080.mat")
+    execute_command("cp sigm~ sigm.mat")
+    qsgw80_gap = helper.get_gap("llmf_080.log")
+    return scf_data, qsgw80_gap, error_flag
 
 def run_qsgw_with_bse(name, nnodes, ncores, max_iter=25):
     """
@@ -635,4 +656,7 @@ def run_qsgw_with_bse(name, nnodes, ncores, max_iter=25):
         error_flag = 1
     else:
         error_flag = 0
+    # save a copy of the self energy files
+    execute_command("cp sigm.mat sigm_qsgwbse.mat")
+    execute_command("cp sig.h5 sig_qsgwbse.h5")
     return scf_data, error_flag

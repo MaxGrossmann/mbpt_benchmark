@@ -11,7 +11,7 @@ This repository contains two separate workflows that, when combined, perform var
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`cifs/`** | This directory contains five example CIF files from the ICSD of materials used in the benchmark. |
 | **`csvs/`** | Band gap benchmark overview as simple CSV files. For future benchmarks, please use the **`revised_bandgap_benchmark.csv`** file. Refer to the publication for details. |
-| **`figures/`**  | Contains all figures shown in the publication. |
+| **`figures/`**  | Contains all figures shown in the publication, as well as ready-to-use plots of the density of states (DOS), band structures, and independent-particle dielectric functions at the different GW levels. |
 | **`g0w0_benchmark/`** | An automated, G<sub>0</sub>W<sub>0</sub>-PPA workflow using Quantum ESPRESSO and Yambo. For a detailed description, check the `README.md` file in the directory. |
 | **`qe_yambo_database/`** | Database created using the **`g0w0_benchmark/`** workflow. We removed structural information from the database entries to comply with the ICSD license. |
 | **`qsgw_benchmark/`** | An automated workflow for different types of quasiparticle self-consistent GW calculations using the Questaal code. For a detailed description, check the `README.md` file in the directory. |
@@ -35,6 +35,19 @@ conda activate mbpt_benchmark
 # 3. install dependencies and workflows
 pip install -r requirements.txt
 ```
+
+**Plotting results:**
+
+Plots of the density of states (DOS), band structures, and independent-particle dielectric functions at the QPG<sub>0</sub>W<sub>0</sub>, QSGW, and QSGW^ levels are included in this repository.  
+
+- **Ready-to-use plots:**  
+  PDF plots for all calculated materials are organized by composition and ICSD identifier, and were generated using the `results.ipynb` notebook in the repository root.  
+
+- **Custom plotting:**  
+  A dedicated notebook, `qsgw_benchmark/analysis/make_plots.ipynb`, can be used to generate DOS, band structure, and dielectric function plots for an individual entry in the database.  
+
+- **Underlying data:**  
+  All plots are based on the JSON files provided in the `questaal_database` directory. These files contain the full numerical data and can be parsed directly (e.g., using `pymatgen`). Examples of parsing and handling the database JSON files can be found in the `results.ipynb` notebook in the repository root.
 
 **Disclaimer:**
 
