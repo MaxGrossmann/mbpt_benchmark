@@ -47,7 +47,7 @@ Plots of the density of states (DOS), band structures, and independent-particle 
   A dedicated notebook, `qsgw_benchmark/analysis/make_plots.ipynb`, can be used to generate DOS, band structure, and dielectric function plots for an individual entry in the database.  
 
 - **Underlying data:**  
-  All plots are based on the JSON files provided in the `questaal_database` directory. These files contain the full numerical data and can be parsed directly (e.g., using `pymatgen`). Examples of parsing and handling the database JSON files can be found in the `results.ipynb` notebook in the repository root.
+  All plots are based on the JSON files provided in the `questaal_database` directory. These files contain the full numerical data and can be parsed directly (e.g., using `pymatgen`). Examples of parsing and handling the database JSON files can be found in the `results.ipynb` notebook in the repository root. For information about the data contained in the JSON files, we refer to `README_questaal_database.md` (see also `README_qe_yambo_database.md`; however, note that no band structures, etc., were calculated in the Quantum ESPRESSO and Yambo workflow).
 
 **Disclaimer:**
 
